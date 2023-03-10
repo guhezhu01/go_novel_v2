@@ -15,9 +15,3 @@ consul:
     Timeout: 1s
     Interval: 10s
 
-mysql:
-  User: guhezhu
-  Password: 3077267500zJ.
-  Host: 123.249.88.132
-  Port: 3306
-  Name: novel
