@@ -1,0 +1,34 @@
+syntax = "proto3";
+package pb;
+
+option go_package = "/internal/service;service";
+
+message UserModel{
+  string  UserName = 1;
+  string Password = 2;
+  uint32  Role = 3;
+}
+
+message UserRequest{
+  UserModel UserDetail = 1;
+  string PasswordConfirm = 2;
+}
+
+message UserDetailResponse{
+  UserModel UserDetail = 1;
+  uint32 Code = 2;
+  string Msg = 3;
+}
+
+
+
+service userService{
+
+  rpc UserRegister(UserRequest) returns(UserDetailResponse);
+  rpc UserLogin(UserRequest) returns (UserDetailResponse);
+  rpc GetUser(UserRequest) returns (UserDetailResponse);
+  rpc  DeleteUser(UserRequest) returns (UserDetailResponse);
+  rpc  EditUser(UserRequest) returns (UserDetailResponse);
+  rpc  UpdateUserPassword(UserRequest) returns (UserDetailResponse);
+  rpc GetUsers(UserRequest) returns (UserDetailResponse);
+}

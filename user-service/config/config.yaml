@@ -1,0 +1,23 @@
+server:
+  domain: user
+  version: 1.0
+  grpc: "127.0.0.1:10001"
+
+consul:
+  ID: v1
+  Tags: [ user,grpc ]
+  Name: user service
+  Address: 127.0.0.1
+  Port: 8801
+  Check:
+    CheckID: user test
+    TCP: 127.0.0.1:8301
+    Timeout: 1s
+    Interval: 10s
+
+mysql:
+  User: guhezhu
+  Password: 3077267500zJ.
+  Host: 123.249.88.132
+  Port: 3306
+  Name: novel
