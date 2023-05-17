@@ -7,7 +7,7 @@ import (
 
 func InitRoutes() *gin.Engine {
 	engine := gin.New()
-	engine.Use(middleware.Cors(), middleware.Logger())
+	engine.Use(middleware.Cors())
 	auth := engine.Group("api/v1")
 	auth.Use(middleware.JwtToken())
 	{
