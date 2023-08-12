@@ -1,0 +1,45 @@
+syntax = "proto3";
+package pb;
+
+option go_package = "/internal/service;service";
+
+message ArticleModel {
+  string Title = 1;
+  string Id = 2;
+  string Type = 3;
+  string Img = 4;
+  string Introduce = 5;
+  string Author = 6;
+  string Clicks = 7;
+  string Chapter = 8;
+  string Words = 9;
+  string State = 10;
+}
+message ArticleContentModel{
+  string Title = 1;
+  string Id = 2;
+  string Type = 3;
+  string Content = 4;
+}
+
+message ArticleDetailResponse{
+
+  uint32 Code = 2;
+  string Msg = 3;
+  int64 Total = 4;
+}
+
+message ArticleContentDetailResponse{
+  ArticleContentModel ArticleContentDetail = 1;
+  uint32 Code = 2;
+  string Msg = 3;
+}
+service ArticleService{
+  rpc GetArticle(ArticleModel) returns(ArticleDetailResponse);
+  rpc GetTypeArticles(ArticleModel) returns(ArticleDetailResponse);
+  rpc GetRandArticle(ArticleModel) returns(ArticleDetailResponse);
+  rpc DeleteArticle(ArticleModel) returns(ArticleDetailResponse);
+
+  rpc GetArticleContent(ArticleModel) returns(ArticleContentDetailResponse);
+  rpc DeleteArticleContent(ArticleModel) returns(ArticleContentDetailResponse);
+}

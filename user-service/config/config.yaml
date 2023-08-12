@@ -1,0 +1,18 @@
+mysql:
+ Host: 123.249.88.132
+ Port: 3306
+ User: guhezhu
+ PassWord: 3077267500zJ.
+ Name: novel
+
+consul:
+  ID: v2 user
+  Tags: [ user,grpc ]
+  Name: user service
+  Address: 127.0.0.1
+  Port: 8801
+  Check:
+    CheckID: user grpc test
+    TCP: 127.0.0.1:8801
+    Timeout: 1s
+    Interval: 5s

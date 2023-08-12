@@ -1,9 +1,9 @@
 AppMode: debug
 HttpPort: :3000
 JwtKey: yourKey
-Mysql:
-  DbHost: 192.168.202.150
-  DbPort: 3306
-  DbUser: root
-  DbPassWord: 3077267500zJ.
-  DbName: novel01
+UserService:
+  name: user service
+  tag: grpc
+consul:
+  Address: 127.0.0.1
+  Port: 8500

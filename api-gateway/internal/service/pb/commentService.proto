@@ -1,0 +1,47 @@
+syntax = "proto3";
+package pb;
+
+option go_package = "/internal/service;service";
+import public "google/protobuf/timestamp.proto";
+message CommentModel {
+  // @inject_tag: json:"id"
+  uint32   id = 1;
+  // @inject_tag: json:"created_id"
+  google.protobuf.Timestamp created_id = 2;
+  // @inject_tag: json:"update_id"
+  google.protobuf.Timestamp update_id = 3;
+  // @inject_tag: json:"delete_id"
+  google.protobuf.Timestamp delete_id = 4;
+  // @inject_tag: json:"user_id"
+  uint32 user_id = 5;
+  // @inject_tag: json:"article_id"
+  string  article_id = 6;
+  // @inject_tag: json:"article_title"
+  string article_title = 7;
+  // @inject_tag: json:"username"
+  string  username = 8;
+  // @inject_tag: json:"content"
+  string  content = 9;
+  // @inject_tag: json:"img"
+  string  img = 10;
+  // @inject_tag: json:"agrees"
+  int64   agrees = 11;
+  // @inject_tag: json:"target"
+  string  target = 12;
+  // @inject_tag: json:"pid"
+  int32     pid = 13;
+
+}
+
+message CommentDetailResponse{
+  repeated CommentModel  CommentDetail = 1;
+  uint32 Code = 2;
+  string Msg = 3;
+  int64 Total = 4;
+}
+service commentService{
+  rpc AddComment(CommentModel) returns(CommentDetailResponse);
+  rpc DeleteComment(CommentModel) returns(CommentDetailResponse);
+  rpc GetComments(CommentModel) returns(CommentDetailResponse);
+  rpc AddAgree(CommentModel) returns(CommentDetailResponse);
+}

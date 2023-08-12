@@ -1,0 +1,26 @@
+mysql:
+  Host: 123.249.88.132
+  Port: 3306
+  User: guhezhu
+  PassWord: 3077267500zJ.
+  Name: novel
+
+redis:
+  Addr: 123.249.88.132:6379
+  Password: 3077267500zJ.
+  DB: 0
+  PoolSize: 20
+  ReadTimeout: 1
+  WriteTimeout: 1
+
+consul:
+  ID: v2 article
+  Tags: [ article,grpc ]
+  Name: article service
+  Address: 127.0.0.1
+  Port: 8802
+  Check:
+    CheckID: article grpc test
+    TCP: 127.0.0.1:8802
+    Timeout: 1s
+    Interval: 5s

@@ -2,6 +2,7 @@ package errMsg
 
 const (
 	SUCCESS = 200
+	TIMEOUT = 408
 	ERROR   = 500
 
 	// UsernameUsed code=1000...用户模块的错误
@@ -30,6 +31,7 @@ const (
 var codeMsg = map[uint32]string{
 	SUCCESS:             "OK",
 	ERROR:               "FAIL",
+	TIMEOUT:             "请求超时",
 	UsernameUsed:        "用户名已存在！",
 	PasswordWrong:       "密码错误",
 	UserNotExist:        "用户不存在",

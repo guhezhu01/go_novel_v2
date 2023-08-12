@@ -5,13 +5,16 @@ import (
 	"github.com/hashicorp/consul/api"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"log"
 	"net"
+	"os"
 	"user-service/internal/handler"
 	"user-service/internal/service"
 )
 
 func RegisterService() {
 	consulConfig := api.DefaultConfig()
+	//consulConfig.Address = "123.249.88.132:8500"
 	//创建consul对象
 	consulClient, err := api.NewClient(consulConfig)
 	if err != nil {
@@ -33,9 +36,11 @@ func RegisterService() {
 	}
 	//注册grpc服务到consul上
 
-	fmt.Println(reg.Check.CheckID)
-	consulClient.Agent().ServiceRegister(&reg)
-
+	err = consulClient.Agent().ServiceRegister(&reg)
+	if err != nil {
+		log.Println(err)
+		os.Exit(0)
+	}
 	//初始化grpc对象
 	grpcServer := grpc.NewServer()
 	//注册服务
@@ -46,9 +51,12 @@ func RegisterService() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("开始监听")
+	log.Println("启动用户服务！")
 	//启动服务
-	grpcServer.Serve(listen)
-	fmt.Println("监听结束")
+	err = grpcServer.Serve(listen)
+	if err != nil {
+		fmt.Println(err)
+	}
 	defer listen.Close()
+
 }

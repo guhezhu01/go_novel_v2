@@ -44,9 +44,9 @@ func SetToken(username string) (string, uint32) {
 // JwtToken 验证token中间件
 func JwtToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		// 根据Authorization,获取前端携带的token信息（有两部分，不能直接比较）
 		tokenHerder := c.Request.Header.Get("Authorization")
+
 		if tokenHerder == "" {
 			code = errMsg.TokenExist
 			c.JSON(http.StatusOK, gin.H{
