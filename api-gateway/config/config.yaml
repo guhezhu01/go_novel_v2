@@ -1,4 +1,4 @@
-AppMode: debug
+AppMode: release
 HttpPort: :3000
 JwtKey: yourKey
 UserService:

@@ -42,7 +42,7 @@ func RegisterService() {
 		os.Exit(0)
 	}
 	//初始化grpc对象
-	grpcServer := grpc.NewServer(middleware.Tracing("fdjfjs"))
+	grpcServer := grpc.NewServer(middleware.Tracing("comment-service"))
 	//注册服务
 	service.RegisterCommentServiceServer(grpcServer, new(handler.CommentsService))
 	//设置监听，指定ip/port
