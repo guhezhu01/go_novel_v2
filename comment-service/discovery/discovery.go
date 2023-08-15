@@ -3,6 +3,7 @@ package discovery
 import (
 	"comment-service/internal/handler"
 	"comment-service/internal/service"
+	"comment-service/middleware"
 	"fmt"
 	"github.com/hashicorp/consul/api"
 	"github.com/spf13/viper"
@@ -41,7 +42,7 @@ func RegisterService() {
 		os.Exit(0)
 	}
 	//初始化grpc对象
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(middleware.Tracing("fdjfjs"))
 	//注册服务
 	service.RegisterCommentServiceServer(grpcServer, new(handler.CommentsService))
 	//设置监听，指定ip/port
