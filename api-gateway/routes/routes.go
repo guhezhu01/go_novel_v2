@@ -31,7 +31,6 @@ func InitRoutes() *gin.Engine {
 
 	engine := gin.Default()
 	middleware.Limit(engine)
-	gin.SetMode(gin.ReleaseMode)
 	engine.Use(middleware.Cors(), middleware.Logger(), timeoutMiddleware())
 	auth := engine.Group("api/v1")
 	auth.Use(middleware.JwtToken())
