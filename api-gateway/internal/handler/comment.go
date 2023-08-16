@@ -27,7 +27,7 @@ func AddComment(c *gin.Context) {
 func DeleteComment(c *gin.Context) {
 	var comment service.Comments
 	_ = c.ShouldBindJSON(&comment)
-	getService := discovery.GetService(c.Request.Context(), "comment service", "grpc")
+	getService := discovery.GetService(c.Request.Context(), "comment-service", "grpc")
 	grpcClient := getService.(service.CommentServiceClient)
 	//调用服务端的方法
 	p, _ := grpcClient.DeleteComment(context.TODO(), &comment)
@@ -42,10 +42,10 @@ func GetComments(c *gin.Context) {
 	comment.ArticleId = c.Query("article_id")
 	comment.ArticleTitle = c.Query("title")
 
-	getService := discovery.GetService(c.Request.Context(), "comment service", "grpc")
+	getService := discovery.GetService(c.Request.Context(), "comment-service", "grpc")
 	grpcClient := getService.(service.CommentServiceClient)
 	//调用服务端的方法
-	p, _ := grpcClient.GetComments(context.TODO(), &comment)
+	p, _ := grpcClient.GetComments(c, &comment)
 	if p.Total > 0 {
 		p.Code = errMsg.SUCCESS
 	} else {

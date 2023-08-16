@@ -21,7 +21,7 @@ func (f *logFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		return nil, nil
 	}
 	if len(requestId) > 0 {
-		entry.Data["x-request-id"] = requestId
+		entry.Data["api-gateway"] = requestId
 	}
 
 	return f.JSONFormatter.Format(entry)

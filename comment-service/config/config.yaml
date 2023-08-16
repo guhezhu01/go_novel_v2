@@ -16,7 +16,7 @@ redis:
 consul:
   ID: v2 comment
   Tags: [ comment,grpc ]
-  Name: comment service
+  Name: comment-service
   Address: 127.0.0.1
   Port: 8501
   Check:

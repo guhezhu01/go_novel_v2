@@ -4,8 +4,11 @@ import (
 	"comment-service/internal/handler"
 	"comment-service/internal/service"
 	"comment-service/middleware"
+	"comment-service/middleware/logger"
+	"context"
 	"fmt"
 	"github.com/hashicorp/consul/api"
+	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"log"
@@ -41,12 +44,18 @@ func RegisterService() {
 		log.Println(err)
 		os.Exit(0)
 	}
+	tracer, closer := middleware.InitTracing("comment-service")
+	defer closer.Close()
+	opentracing.SetGlobalTracer(tracer)
+
 	//初始化grpc对象
 	grpcServer := grpc.NewServer(middleware.Tracing("comment-service"))
 	//注册服务
 	service.RegisterCommentServiceServer(grpcServer, new(handler.CommentsService))
 	//设置监听，指定ip/port
 	addr := viper.GetString("consul.Address") + ":" + viper.GetString("consul.Port")
+
+	logger.WithContext(context.Background(), "main").Infof("comment service")
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
 		fmt.Println(err)

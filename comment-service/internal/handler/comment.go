@@ -33,6 +33,7 @@ func (c CommentsService) DeleteComment(ctx context.Context, req *service.Comment
 
 func (c CommentsService) GetComments(ctx context.Context, req *service.Comments) (resq *service.CommentsDetailResponse, err error) {
 	logger.WithContext(ctx).Infof("传递的参:%s", req.ArticleTitle)
+
 	// 将[]service.CommentModel转为[]*service.CommentModel
 	var commentDate []*service.Comments
 	comments, total := repository.GetComments(req.ArticleId, req.ArticleTitle)
