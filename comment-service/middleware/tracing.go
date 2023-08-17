@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	"github.com/guhezhu01/go_novel_v2/model-tools/log"
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go"
 	"github.com/uber/jaeger-client-go/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"io"
-	"log"
 )
 
 func Tracing(key string) grpc.ServerOption {
@@ -47,12 +47,6 @@ func GetRequestID(ctx context.Context, key string) (string, bool) {
 }
 
 func InitTracing(service string) (opentracing.Tracer, io.Closer) {
-	//cfg, err := config.FromEnv()
-	//
-	//cfg.ServiceName = service
-	//cfg.Sampler.Type = "const"
-	//cfg.Sampler.Param = 1
-	//cfg.Reporter.LogSpans = true
 	cfg := &config.Configuration{
 		ServiceName: service,
 		Sampler: &config.SamplerConfig{
@@ -66,8 +60,9 @@ func InitTracing(service string) (opentracing.Tracer, io.Closer) {
 	}
 	tracer, closer, err := cfg.NewTracer(config.Logger(jaeger.StdLogger))
 	if err != nil {
+		log.Println(err)
 		panic(fmt.Sprintf("ERROR: cannot init Jaeger: %v\n", err))
 	}
-	//spanContext, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(header))
+
 	return tracer, closer
 }

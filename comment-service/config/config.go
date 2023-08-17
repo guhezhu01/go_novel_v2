@@ -1,8 +1,9 @@
 package config
 
 import (
+	"github.com/guhezhu01/go_novel_v2/model-tools/log"
 	"github.com/spf13/viper"
-	"log"
+
 	"os"
 )
 

@@ -39,7 +39,7 @@ func Println(v ...any) {
 
 	entry := logger.WithFields(logrus.Fields{
 		"data":        data,
-		"serviceName": "comment",
+		"serviceName": serviceName,
 	})
 	entry.Info()
 }

@@ -5,11 +5,11 @@ import (
 	"comment-service/internal/service"
 	"comment-service/middleware"
 	"fmt"
+	"github.com/guhezhu01/go_novel_v2/model-tools/log"
 	"github.com/hashicorp/consul/api"
 	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 	"os"
 )
@@ -55,7 +55,6 @@ func RegisterService() {
 	//设置监听，指定ip/port
 	addr := viper.GetString("consul.Address") + ":" + viper.GetString("consul.Port")
 
-	//logger.WithContext(context.Background(), "comment-service").Infof("comment-service")
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
 		fmt.Println(err)
@@ -65,12 +64,12 @@ func RegisterService() {
 	//启动服务
 	err = grpcServer.Serve(listen)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer func() {
 		err := listen.Close()
 		if err != nil {
-			fmt.Println("评论服务关闭失败！")
+			log.Println("评论服务关闭失败！")
 		}
 	}()
 
