@@ -9,7 +9,8 @@ import (
 	"time"
 )
 
-func Println(data string) {
+func Println(v ...any) {
+	data := fmt.Sprintln(v...)
 	scr, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println("err:", err)

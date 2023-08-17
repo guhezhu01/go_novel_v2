@@ -9,5 +9,5 @@ func TestA(t *testing.T) {
 	if !ok {
 
 	}
-	Println("qweoqoeqoffsfsdf")
+	Println("qweoqoeqoffsfsdf", "jdfjsdjf")
 }
