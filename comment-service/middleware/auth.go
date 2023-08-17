@@ -1,67 +1,69 @@
 package middleware
 
 import (
+	"comment-service/internal/service"
+	"comment-service/pkg/errMsg"
 	"context"
 	"github.com/dgrijalva/jwt-go"
-	"google.golang.org/grpc/codes"
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 	"log"
-	"time"
 )
 
-// MyClaims token生成可以用struct或者map
-type MyClaims struct {
-	Username string `json:"username"`
+type RpcClaims struct {
+	Id string
 	jwt.StandardClaims
 }
 
-const JwtKey = "kdfjksfsk"
-
-func CheckToken(ctx context.Context) (context.Context, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return ctx, status.Error(codes.Unauthenticated, "no authorized")
-	}
-	tokens := md.Get("token")
-	if len(tokens) == 0 {
-		return ctx, status.Error(codes.Unauthenticated, "no authorized")
-	}
-
-	settoken, err := jwt.ParseWithClaims(tokens[0], &MyClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return JwtKey, nil
+func checkToken(token, id string) bool {
+	setToken, err := jwt.ParseWithClaims(token, &RpcClaims{}, func(token *jwt.Token) (interface{}, error) {
+		key := viper.GetString("AuthKey")
+		keyByte := []byte(key)
+		return keyByte, nil
 	})
-	log.Print(settoken)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
 
-	//// Claims.(*MyClaims) (断言) 获取到MyClaims结构体类型的内容(包含用户名等信息)
-	//key, _ := settoken.Claims.(*MyClaims)
-	//
-	//if settoken.Valid {
-	//	return key, errMsg.SUCCESS
-	//} else {
-	//	return nil, errMsg.ERROR
-	//}
-	return ctx, err
+	key, _ := setToken.Claims.(*RpcClaims)
+	if setToken.Valid {
+		if key.Id != id {
+			return false
+		}
+	} else {
+		return false
+	}
+	return true
 }
 
-// SetToken 生成token(登录时)
-func checkToken(username string) (string, bool) {
-	// expireTime 设置超时
-	expireTime := time.Now().Add(10 * time.Minute).Unix()
-	SetClaims := MyClaims{
-		username,
-		jwt.StandardClaims{
-			ExpiresAt: expireTime,
-			Issuer:    "gonovel",
-		},
-	}
+func AuthCheckToken(serviceName string) grpc.ServerOption {
+	return grpc.ChainUnaryInterceptor(
+		func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+			md, _ := metadata.FromIncomingContext(ctx)
+			ctxDataToken := md.Get("token")
+			ctxDataIds := md.Get(serviceName)
 
-	// 根据加密算法和Claims对象来创建Token实例
-	reClaim := jwt.NewWithClaims(jwt.SigningMethodHS256, SetClaims)
-	// SignedString()利用传入的密钥生成签名字符串
-	token, err := reClaim.SignedString(JwtKey)
-	if err != nil {
-		return "", false
-	}
-	return token, true
+			if len(ctxDataToken) > 0 && len(ctxDataIds) > 0 {
+				token := ctxDataToken[0]
+				id := ctxDataIds[0]
+				ok := checkToken(token, id)
+				if !ok {
+					return authTokenHandler(ctx, req)
+				}
+				return handler(ctx, req)
+			} else {
+				log.Println("no token")
+				return authTokenHandler(ctx, req)
+			}
+			return handler(ctx, req)
+		})
+}
+
+func authTokenHandler(_ context.Context, _ interface{}) (interface{}, error) {
+	resp := &service.CommentsDetailResponse{}
+	resp.Code = errMsg.TokenFailed
+	resp.Msg = errMsg.GetErrMsg(errMsg.TokenFailed)
+	return resp, nil
 }

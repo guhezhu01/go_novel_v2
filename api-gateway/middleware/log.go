@@ -28,7 +28,6 @@ func Logger() gin.HandlerFunc {
 		filePath+"%Y%m%d.log",
 		retalog.WithMaxAge(7*24*time.Hour),
 		retalog.WithRotationTime(24*time.Hour),
-		//retalog.WithLinkName(linkName),
 	)
 
 	writeMap := lfshook.WriterMap{

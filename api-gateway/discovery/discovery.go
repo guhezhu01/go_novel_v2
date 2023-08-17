@@ -3,21 +3,17 @@ package discovery
 import (
 	"api-gateway/internal/service"
 	"api-gateway/middleware"
-	"api-gateway/middleware/logger"
-	"context"
 	"fmt"
 	"github.com/google/uuid"
-	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/hashicorp/consul/api"
 	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"
 	"strconv"
 )
 
-func GetService(ctx context.Context, serviceName, tag string) interface{} {
+func GetService(serviceName, tag string) interface{} {
 
 	//初始化consul配置
 	config := api.DefaultConfig()
@@ -34,23 +30,15 @@ func GetService(ctx context.Context, serviceName, tag string) interface{} {
 	//使用从服务发现获取到服务的ip/port
 	addr := services[0].Service.Address + ":" + strconv.Itoa(services[0].Service.Port)
 
-	tracer, closer := middleware.InitTracing("api-service")
-	defer closer.Close()
+	tracer, closer := middleware.InitTracing(viper.GetString("ServiceName"))
 	opentracing.SetGlobalTracer(tracer)
-
 	//连接服务
+	id := uuid.New().String()
 	grpcConn, err := grpc.Dial(
 		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithChainUnaryInterceptor(
-			func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-				id := uuid.New().String()
-				ctx = metadata.AppendToOutgoingContext(ctx, "api-gateway", id)
-				logger.WithContext(ctx).Infof("调用的服务")
-				return invoker(ctx, method, req, reply, cc, opts...)
-			},
-			grpc_opentracing.UnaryClientInterceptor(),
-		),
+		middleware.TracingClientMiddleWare(serviceName, id, closer),
+		middleware.AuthMiddleWare(viper.GetString("AuthKey"), id),
 	)
 	if err != nil {
 		fmt.Println("连接错误:", err)
@@ -64,6 +52,5 @@ func GetService(ctx context.Context, serviceName, tag string) interface{} {
 	case "comment-service":
 		grpcClient = service.NewCommentServiceClient(grpcConn)
 	}
-
 	return grpcClient
 }

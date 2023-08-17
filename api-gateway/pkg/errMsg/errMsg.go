@@ -26,6 +26,7 @@ const (
 	CommentAddWrong = 4002
 	// CollectionAdded 收藏
 	CollectionAdded = 5001
+	TokenFailed     = 10001
 )
 
 var codeMsg = map[uint32]string{
@@ -47,6 +48,7 @@ var codeMsg = map[uint32]string{
 	CommentNotExist: "评论不存在",
 	CommentAddWrong: "点赞发生错误",
 	CollectionAdded: "您已收藏该书籍!",
+	TokenFailed:     "token验证失败",
 }
 
 func GetErrMsg(code uint32) string {

@@ -3,8 +3,8 @@ package middleware
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
-	opentracing "github.com/opentracing/opentracing-go"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go"
 	config "github.com/uber/jaeger-client-go/config"
 	"google.golang.org/grpc"
@@ -12,45 +12,39 @@ import (
 	"io"
 )
 
-func Tracing(key string) grpc.ServerOption {
-	return grpc.ChainUnaryInterceptor(withRequestID(key))
-}
-
-func withRequestID(key string) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-		md, _ := metadata.FromIncomingContext(ctx)
-		reqId := md.Get(key)
-		if len(reqId) > 0 {
-			ctx = NewWithContext(ctx, reqId[0], key)
-		}
-		return handler(ctx, req)
-	}
-}
-
-func NewWithContext(ctx context.Context, id string, key string) context.Context {
-	if id == "" {
-		id = uuid.New().String()
-	}
-	return context.WithValue(ctx, key, id)
+func TracingClientMiddleWare(serviceName, id string, closer io.Closer) grpc.DialOption {
+	return grpc.WithChainUnaryInterceptor(
+		func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+			ctx = metadata.AppendToOutgoingContext(ctx, serviceName, id)
+			defer func() {
+				closer.Close()
+			}()
+			return invoker(ctx, method, req, reply, cc, opts...)
+		},
+		grpc_opentracing.UnaryClientInterceptor())
 }
 
 func GetRequestID(ctx context.Context, key string) (string, bool) {
 	reqId, _ := ctx.Value(key).(string)
 	if reqId == "" {
+		md, _ := metadata.FromIncomingContext(ctx)
+		reqIds := md.Get(key)
+		if len(reqIds) == 0 {
+			return reqId, false
+		}
+		reqId = reqIds[0]
+		if reqId != "" {
+			return reqId, true
+		}
 		return reqId, false
 	}
 	return reqId, true
 }
 
-func InitTracing(service string) (opentracing.Tracer, io.Closer) {
-	//cfg, err := config.FromEnv()
-	//
-	//cfg.ServiceName = service
-	//cfg.Sampler.Type = "const"
-	//cfg.Sampler.Param = 1
-	//cfg.Reporter.LogSpans = true
+func InitTracing(serviceName string) (opentracing.Tracer, io.Closer) {
+
 	cfg := &config.Configuration{
-		ServiceName: service,
+		ServiceName: serviceName,
 		Sampler: &config.SamplerConfig{
 			Type:  "const",
 			Param: 1,
@@ -61,8 +55,10 @@ func InitTracing(service string) (opentracing.Tracer, io.Closer) {
 		},
 	}
 	tracer, closer, err := cfg.NewTracer(config.Logger(jaeger.StdLogger))
+
 	if err != nil {
 		panic(fmt.Sprintf("ERROR: cannot init Jaeger: %v\n", err))
 	}
+
 	return tracer, closer
 }

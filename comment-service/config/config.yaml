@@ -24,3 +24,5 @@ consul:
     TCP: 127.0.0.1:8501
     Timeout: 1s
     Interval: 5s
+
+AuthKey: 2389dsfjfjf

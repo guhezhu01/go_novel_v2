@@ -6,6 +6,7 @@ import (
 	"api-gateway/pkg/errMsg"
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"net/http"
 	"strconv"
 )
@@ -13,7 +14,7 @@ import (
 func AddComment(c *gin.Context) {
 	var comment service.Comments
 	_ = c.ShouldBindJSON(&comment)
-	getService := discovery.GetService(c.Request.Context(), "comment service", "grpc")
+	getService := discovery.GetService("comment service", "grpc")
 	grpcClient := getService.(service.CommentServiceClient)
 	//调用服务端的方法
 	p, _ := grpcClient.AddComment(context.TODO(), &comment)
@@ -27,7 +28,9 @@ func AddComment(c *gin.Context) {
 func DeleteComment(c *gin.Context) {
 	var comment service.Comments
 	_ = c.ShouldBindJSON(&comment)
-	getService := discovery.GetService(c.Request.Context(), "comment-service", "grpc")
+	serviceName := viper.GetString("CommentService.name")
+	tag := viper.GetString("CommentService.tag")
+	getService := discovery.GetService(serviceName, tag)
 	grpcClient := getService.(service.CommentServiceClient)
 	//调用服务端的方法
 	p, _ := grpcClient.DeleteComment(context.TODO(), &comment)
@@ -41,15 +44,18 @@ func GetComments(c *gin.Context) {
 	var comment service.Comments
 	comment.ArticleId = c.Query("article_id")
 	comment.ArticleTitle = c.Query("title")
-
-	getService := discovery.GetService(c.Request.Context(), "comment-service", "grpc")
+	serviceName := viper.GetString("CommentService.name")
+	tag := viper.GetString("CommentService.tag")
+	getService := discovery.GetService(serviceName, tag)
 	grpcClient := getService.(service.CommentServiceClient)
 	//调用服务端的方法
 	p, _ := grpcClient.GetComments(c, &comment)
-	if p.Total > 0 {
-		p.Code = errMsg.SUCCESS
-	} else {
-		p.Code = errMsg.CommentNotExist
+	if p.Code == errMsg.SUCCESS {
+		if p.Total > 0 {
+			p.Code = errMsg.SUCCESS
+		} else {
+			p.Code = errMsg.CommentNotExist
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":   p.Code,
@@ -67,7 +73,7 @@ func AddAgree(c *gin.Context) {
 	userId, _ := strconv.ParseUint(c.Param("user_id"), 10, 32)
 	comment.UserId = uint32(userId)
 	_ = c.ShouldBindJSON(&comment)
-	getService := discovery.GetService(c.Request.Context(), "comment service", "grpc")
+	getService := discovery.GetService("comment service", "grpc")
 	grpcClient := getService.(service.CommentServiceClient)
 	//调用服务端的方法
 	p, _ := grpcClient.AddAgree(context.TODO(), &comment)

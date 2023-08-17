@@ -1,9 +1,14 @@
 AppMode: release
 HttpPort: :3000
 JwtKey: yourKey
+ServiceName: api-gateway
 UserService:
-  name: user service
+  name: user-service
+  tag: grpc
+CommentService:
+  name: comment-service
   tag: grpc
 consul:
   Address: 127.0.0.1
   Port: 8500
+AuthKey: 2389dsfjfjf

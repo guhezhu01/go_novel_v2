@@ -69,5 +69,6 @@ func (lock *RedisLock) Unlock() bool {
 		fmt.Println("释放锁发生错误：", err)
 		return false
 	}
+
 	return true
 }

@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"io"
+	"log"
 )
 
 func Tracing(key string) grpc.ServerOption {
@@ -21,7 +22,9 @@ func withRequestID(key string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		md, _ := metadata.FromIncomingContext(ctx)
 		reqId := md.Get(key)
+		log.Println(reqId)
 		if len(reqId) > 0 {
+
 			ctx = NewWithContext(ctx, reqId[0], key)
 		}
 		return handler(ctx, req)
@@ -65,5 +68,6 @@ func InitTracing(service string) (opentracing.Tracer, io.Closer) {
 	if err != nil {
 		panic(fmt.Sprintf("ERROR: cannot init Jaeger: %v\n", err))
 	}
+	//spanContext, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(header))
 	return tracer, closer
 }
