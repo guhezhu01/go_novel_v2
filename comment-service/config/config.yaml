@@ -26,3 +26,5 @@ consul:
     Interval: 5s
 
 AuthKey: 2389dsfjfjf
+
+LogPath: log/log

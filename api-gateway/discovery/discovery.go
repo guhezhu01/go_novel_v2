@@ -3,8 +3,8 @@ package discovery
 import (
 	"api-gateway/internal/service"
 	"api-gateway/middleware"
-	"fmt"
 	"github.com/google/uuid"
+	"github.com/guhezhu01/go_novel_v2/model-tools/log"
 	"github.com/hashicorp/consul/api"
 	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/viper"
@@ -22,7 +22,7 @@ func GetService(serviceName, tag string) interface{} {
 	consulClient, err01 := api.NewClient(config)
 
 	if err01 != nil {
-		fmt.Println(err01)
+		log.Println(err01)
 	}
 	//服务发现，从consul上获取健康的服务
 	services, _, err := consulClient.Health().Service(serviceName, tag, true, nil)
@@ -41,7 +41,7 @@ func GetService(serviceName, tag string) interface{} {
 		middleware.AuthMiddleWare(viper.GetString("AuthKey"), id),
 	)
 	if err != nil {
-		fmt.Println("连接错误:", err)
+		log.Println("连接错误:", err)
 	}
 
 	//初始化grpc客户端

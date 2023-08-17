@@ -6,12 +6,13 @@ import (
 	retalog "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"os"
 	"time"
 )
 
 func Logger() gin.HandlerFunc {
-	filePath := "log/log"
+	filePath := viper.GetString("LogWebPath")
 
 	scr, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {

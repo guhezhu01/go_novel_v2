@@ -3,8 +3,8 @@ package main
 import (
 	"api-gateway/config"
 	"api-gateway/routes"
+	"github.com/guhezhu01/go_novel_v2/model-tools/log"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,7 +14,7 @@ func main() {
 	config.InitConfig()
 
 	engine := routes.InitRoutes()
-
+	log.InitRpcLog(viper.GetString("LogPath"), viper.GetString("ServiceName"))
 	go func() {
 		engine.Run(viper.GetString("HttpPort"))
 	}()

@@ -12,3 +12,5 @@ consul:
   Address: 127.0.0.1
   Port: 8500
 AuthKey: 2389dsfjfjf
+LogWebPath: log_web/log
+LogPath: log/log
