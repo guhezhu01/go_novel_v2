@@ -5,7 +5,7 @@ import (
 )
 
 func TestA(t *testing.T) {
-	ok := InitLog("log/log", "comment")
+	ok := InitRpcLog("log/log", "comment")
 	if !ok {
 
 	}
