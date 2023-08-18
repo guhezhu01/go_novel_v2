@@ -1,11 +1,9 @@
 package main
 
 import (
-	"comment-service/config"
 	"comment-service/discovery"
-	"comment-service/internal/repository"
+	initConfig "comment-service/init-config"
 	"github.com/guhezhu01/go_novel_v2/model-tools/log"
-	"github.com/spf13/viper"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,10 +11,7 @@ import (
 
 func main() {
 
-	config.InitConfig()
-	repository.InitDb()
-	repository.InitCache()
-	log.InitRpcLog(viper.GetString("LogPath"), viper.GetString("consul.Name"))
+	initConfig.Init()
 	go func() {
 		discovery.RegisterService()
 	}()

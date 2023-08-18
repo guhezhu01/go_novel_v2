@@ -30,8 +30,8 @@ func testResponse(c *gin.Context) {
 func InitRoutes() *gin.Engine {
 
 	engine := gin.Default()
-	middleware.Limit(engine)
-	engine.Use(middleware.Cors(), middleware.Logger(), timeoutMiddleware())
+	//middleware.Limit(engine)
+	engine.Use(middleware.Cors(), middleware.Logger())
 	auth := engine.Group("api/v1")
 	auth.Use(middleware.JwtToken())
 	{

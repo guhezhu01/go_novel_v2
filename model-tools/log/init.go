@@ -1,6 +1,8 @@
 package log
 
-import "log"
+import (
+	"log"
+)
 
 var filePath string
 var serviceName string

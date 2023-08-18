@@ -15,7 +15,7 @@ type RedisLock struct {
 }
 
 // 对同一个数据加锁，但是只能一个进程解锁
-func InitLock(addr, password string) *RedisLock {
+func InitLock(addr, password string) (*RedisLock, bool) {
 	pool := &redis.Pool{
 		MaxIdle:     30,          // 最大连接数
 		MaxActive:   100,         //最大活跃连接数，0代表无限
@@ -37,7 +37,11 @@ func InitLock(addr, password string) *RedisLock {
 		},
 	}
 	lock := newRedisLock(pool, 10*time.Second)
-	return lock
+
+	if lock == nil {
+		return nil, false
+	}
+	return lock, true
 }
 
 func newRedisLock(pool *redis.Pool, expire time.Duration) *RedisLock {

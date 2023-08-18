@@ -6,15 +6,37 @@ import (
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"os"
+	"sync"
 	"time"
 )
 
+type logger struct {
+	mu sync.Mutex
+}
+
+var l *logger
+
+func init() {
+	l = new()
+}
+func new() *logger {
+	l := &logger{}
+	return l
+}
+
 func Println(v ...any) {
-	data := fmt.Sprintln(v...)
-	scr, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0755)
+	l.Output(fmt.Sprintln(v...))
+}
+
+func (l logger) Output(str string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	scr, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
+
 	logger := logrus.New()
 	logger.Out = scr
 	logWriter, _ := retalog.New(
@@ -38,8 +60,9 @@ func Println(v ...any) {
 	logger.AddHook(Hook)
 
 	entry := logger.WithFields(logrus.Fields{
-		"data":        data,
+		"data":        str,
 		"serviceName": serviceName,
 	})
 	entry.Info()
+
 }
